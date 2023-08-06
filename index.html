@@ -1,0 +1,355 @@
+<html>
+<title>
+    Colour Quest
+</title>
+
+<head>
+    <style>
+        #game {
+            font-size: 20px;
+        }
+
+        .color-header {
+            margin: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 25px;
+
+        }
+
+        .color-header span {
+            position: absolute;
+            right: 30;
+            font-family: fantasy;
+        }
+
+        #color-to-guess {
+            /* border: 1px solid black; */
+            width: calc(100% - 20px);
+            height: 100px;
+            margin: 10px;
+        }
+
+
+
+        .color-container {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .color-container span {
+            padding: 40px;
+        }
+
+        header {
+            height: 70px;
+            background-color: rgb(50, 50, 50);
+
+            color: white;
+            display: flex;
+        }
+
+        img {
+            height: 60px;
+            margin: 5px 20px;
+        }
+
+        .icon {
+            height: 50px;
+            margin: 10px 10px;
+        }
+
+        .game-name {
+            width: calc(100% - 240px);
+            text-align: center;
+            font-family: fantasy;
+            font-size: 55px;
+        }
+
+        input {
+            width: 100%;
+        }
+
+
+        .result {
+            background-color: none;
+            border: none;
+            height: 70px;
+            width: 70px;
+        }
+
+        .label-container,
+        .value-container {
+            display: flex;
+            flex-direction: column;
+            padding: 0px 5px;
+            width: 40px;
+        }
+
+        .slider-container {
+            width: calc(100% - 180px);
+            display: flex;
+            flex-direction: column;
+            padding: 0px 5px;
+        }
+
+        .guess {
+            border: 1px solid lightgray;
+            margin: 5px;
+        }
+
+        button {
+            width: 130px;
+            height: 40px;
+            margin-top: 10px;
+            font-size: 15px;
+            border-radius: 5px;
+            color: white;
+            background: rgb(50, 50, 50);
+        }
+
+        #restart-button {
+            display: none;
+        }
+
+        #dialog {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+
+        }
+
+        #dialog-content {
+            background-color: white;
+            padding: 15px;
+            text-align: justify;
+            width: 30%;
+            margin: auto;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        #dialog-button-container {
+            width: 100%;
+            text-align: center;
+        }
+
+        #dialog-button {
+            background-color: rgb(50, 50, 50);
+            color: white;
+            border-radius: 5px;
+            width: 50px;
+            height: 35px;
+
+        }
+    </style>
+
+    <script>
+        var coloursToGuess = [];
+        const COLOURS = ['red', 'green', 'blue'];
+        const MAX_GUESS = 6;
+
+        var isGuessCorrect = [false, false, false];
+
+        function startNewGame() {
+            document.getElementById('guess-input').replaceChildren();
+            coloursToGuess = [];
+            setColor();
+            document.getElementById('restart-button').style.display = 'none';
+            document.getElementById('check-button').style.display = 'block';
+            guessCount = 0;
+            document.getElementById('guess-count').innerHTML = 'Guess 1 of 6';
+            isGuessCorrect = [false, false, false];
+            addRow();
+        }
+
+        function setColor() {
+            var colorToGuessDiv = document.getElementById('color-to-guess');
+            coloursToGuess.push(Math.floor(Math.random() * 22) * 10);
+            coloursToGuess.push(Math.floor(Math.random() * 22) * 10);
+            coloursToGuess.push(green = Math.floor(Math.random() * 22) * 10);
+            colorToGuessDiv.style.backgroundColor = 'rgb(' + String(coloursToGuess[0]) + ',' + String(coloursToGuess[1]) + ',' + String(coloursToGuess[2]) + ')';
+        }
+
+        function addRow() {
+            var div = document.getElementById('guess-input');
+            var guessDiv = document.createElement('div');
+            guessDiv.style.display = 'flex';
+            guessDiv.className = 'guess';
+            var sliderDiv = document.createElement('div');
+            sliderDiv.className = 'slider-container';
+            var labelContainer = document.createElement('div');
+            labelContainer.className = 'label-container';
+            var label;
+            var valueContainer = document.createElement('value-container');
+            valueContainer.className = 'value-container';
+            var value;
+
+            for (var i = 0; i < 3; ++i) {
+                label = document.createElement('span');
+                label.innerHTML = COLOURS[i];
+                label.style.color = COLOURS[i];
+                label.style.textTransform = 'capitalize';
+                labelContainer.appendChild(label);
+                slider = document.createElement('input');
+                slider['index'] = i;
+                slider.type = 'range';
+                slider.max = 220;
+                slider.min = 0;
+                slider.value = 0;
+                slider.step = 10;
+
+                if (isGuessCorrect[i]) {
+                    slider.disabled = true;
+                    slider.value = coloursToGuess[i];
+                }
+
+                else {
+                    slider.onchange = function (ev) { updateLabel(ev) };
+                }
+
+                sliderDiv.appendChild(slider);
+                value = document.createElement('span');
+                value.innerHTML = 0;
+                value.className = 'value';
+                value.style.color = COLOURS[i];
+                valueContainer.appendChild(value);
+            }
+
+            guessDiv.appendChild(labelContainer)
+            guessDiv.appendChild(sliderDiv);
+            guessDiv.appendChild(valueContainer);
+
+            var resultDiv = document.createElement('div');
+            resultDiv.className = 'result';
+            guessDiv.appendChild(resultDiv);
+            div.appendChild(guessDiv)
+        }
+
+        function updateLabel(event) {
+            var valueToUpdate = event.srcElement.value;
+            var labelIndexToUpdate = event.srcElement.index;
+            document.getElementsByClassName('value-container')[guessCount].children[labelIndexToUpdate].innerHTML = valueToUpdate;
+        }
+
+        function checkGuess() {
+            var inputs = document.getElementsByClassName('slider-container')[guessCount].children;
+            var guessedRed = parseInt(inputs[0].value);
+            var guessedGreen = parseInt(inputs[1].value);
+            var guessedBlue = parseInt(inputs[2].value);
+            resultDiv = document.getElementsByClassName('result')[guessCount];
+            resultDiv.style.backgroundColor = 'rgb(' + guessedRed + ',' + guessedGreen + ',' + guessedBlue + ')';
+            guessCount++;
+            if ((coloursToGuess[0] === guessedRed) && !isGuessCorrect[0]) {
+                isGuessCorrect[0] = true;
+                showDialog('You guessed Red correctly', 'Guess the remaining component(s) to win the game');
+            }
+            if ((coloursToGuess[1] == guessedGreen) && !isGuessCorrect[1]) {
+                isGuessCorrect[1] = true;
+                showDialog('You guessed Green correctly', 'Guess the remaining component(s) to win the game');
+            }
+
+            if ((coloursToGuess[2] == guessedBlue) && !isGuessCorrect[2]) {
+                isGuessCorrect[2] = true;
+                showDialog('You guessed Blue correctly', 'Guess the remaining component(s) to win the game');
+            }
+
+            if (isGuessCorrect[0] && isGuessCorrect[1] && isGuessCorrect[2])
+                winGame();
+            else if (guessCount == MAX_GUESS)
+                gameOver();
+            else {
+                addRow();
+                document.getElementById('guess-count').innerHTML = 'Guess ' + String(parseInt(guessCount) + 1) + ' of ' + MAX_GUESS;
+
+            }
+        }
+
+        function winGame() {
+            showDialog('You Win!', '');
+
+            document.getElementById('check-button').style.display = 'none';
+            document.getElementById('restart-button').style.display = 'block';
+        }
+
+        function gameOver() {
+            showDialog('Game Over!', 'You have reached the number of allowed guesses! The correct answer was rgb(' + coloursToGuess[0] + ',' + coloursToGuess[1] + ',' + coloursToGuess[2] + ')');
+            document.getElementById('check-button').style.display = 'none';
+            document.getElementById('restart-button').style.display = 'block';
+        }
+
+        function closeDialog() {
+            document.getElementById('dialog').style.display = 'none';
+        }
+
+        function showDialog(heading, text) {
+            document.getElementById('dialog').style.display = 'block';
+            document.getElementById('dialog-heading').innerHTML = heading;
+            document.getElementById('dialog-text').innerHTML = text;
+        }
+
+        function openHelpDialog() {
+            var content = "Every colour can be made from a combination of the primary colours red, green and blue, or RGB <br><br> In this game, you must guess the correct combination of red, green and blue that form the colour on the top of your screen.  <br><br>  Use the sliders to select the value of the primary colours. <br><br> The value of each primary colour is a multiple of 10, and hence you can only select multiples of 10 using the sliders.<br><br> You have 6 attempts to guesss the colour."
+            showDialog("How to Play?", content);
+        }
+
+        function openAboutDialog() {
+            var content = "Colour Quest is a colour-guessing game based on the RGB colour model and inspired by the game Wordle. <br><br> I hope you enjoy playing this game as much as I enjoyed making it!<br><br> All vectors and icons used in this project have been downloaded from <a href='https://www.svgrepo.com' target='_blank'>SVG Repo</a>."
+            showDialog('About', content);
+        }
+    </script>
+
+</head>
+
+<body onload="startNewGame()">
+    <div id="game">
+        <header>
+            <img src="assets/rgb-svgrepo-com.svg">
+            <title> Source: svgrepo.com</title>
+            <div class="game-name">
+                Colour Quest
+            </div>
+            <img src="assets/question-mark-circled-svgrepo-com.svg" onclick="openHelpDialog()" class="icon">
+            <img src="assets/info-circle-svgrepo-com.svg" onclick="openAboutDialog()" class="icon">
+        </header>
+
+        <div class='color-header'>
+            Guess the RGB values of the colour below :
+            <span id="guess-count">
+                Guess 1 of 6
+            </span>
+        </div>
+
+        <div id="color-to-guess">
+        </div>
+
+        <div id="guess-input">
+        </div>
+        <button id='check-button' onclick="checkGuess()"> Check My Guess</button>
+        <button id='restart-button' onclick="startNewGame()"> Play Again</button>
+    </div>
+
+    <div id='dialog'>
+        <div id="dialog-content">
+            <h3 id='dialog-heading'> </h3>
+            <p id="dialog-text"></p>
+            <div id='dialog-button-container'>
+                <button id='dialog-button' onclick="closeDialog()"> OK </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
