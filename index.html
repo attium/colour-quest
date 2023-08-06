@@ -285,7 +285,7 @@
         }
 
         function gameOver() {
-            showDialog('Game Over!', 'You have reached the number of allowed guesses! The correct answer was rgb(' + coloursToGuess[0] + ',' + coloursToGuess[1] + ',' + coloursToGuess[2] + ')');
+            showDialog('Game Over!', 'You have reached the maximum number of allowed guesses! The correct answer was RGB(' + coloursToGuess[0] + ',' + coloursToGuess[1] + ',' + coloursToGuess[2] + ')');
             document.getElementById('check-button').style.display = 'none';
             document.getElementById('restart-button').style.display = 'block';
         }
